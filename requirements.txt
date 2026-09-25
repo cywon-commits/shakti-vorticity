@@ -1,0 +1,9 @@
+numpy
+scipy
+matplotlib
+numba
+networkx
+pulp
+sympy
+mpmath
+Pillow
