@@ -1,0 +1,14 @@
+fig01_mapping.pdf  <-  pf_fig1.py
+fig02_template.pdf  <-  pf_fig2.py
+fig03_exactmaps.pdf  <-  pf_fig4.py
+fig04_exactscaling.pdf  <-  pf_fig5.py
+fig05_phasemap.pdf  <-  pf_fig7.py
+fig06_straight_edges.pdf  <-  pf_fig_axis.py
+fig07_correlations.pdf  <-  pf_fig10.py
+fig08_robust.pdf  <-  pf_fig08.py (top row: raster crops of the string panels from pf_fig11.py output)
+fig09_flip.pdf  <-  pf_fig2.py (fig_flip)
+fig10_examples.pdf  <-  pf_fig3.py
+fig11_shape.pdf  <-  pf_fig6.py
+fig12_psi.pdf  <-  pf_fig12_psi.py (data: exact_psi_nm.py I 36 37 38 39)
+fig13_holes.pdf  <-  pf_fig9.py
+fig14_edge_temperature.pdf  <-  pf_fig_edgeT.py

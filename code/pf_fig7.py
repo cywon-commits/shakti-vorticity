@@ -38,7 +38,7 @@ edges=np.arange(0,1.42,0.05); mid=(edges[1:]+edges[:-1])/2; mean=[aa[(rr>=lo)&(r
 c_.plot(mid,mean,'-',color='k',lw=1.1,label='ring average')
 c_.axvline(1,color='#888',ls='--',lw=.8); c_.text(1.02,0.15,'arctic\ncircle',fontsize=6.5,color='#555',va='bottom')
 c_.text(0.03,0.93,'liquid: algebraic order',fontsize=7,transform=c_.transAxes,va='top'); c_.text(0.97,0.82,'frozen',fontsize=7,transform=c_.transAxes,va='top',ha='right')
-c_.set_xlim(0,1.42); c_.set_ylim(0,1.08); c_.set_xlabel('distance from centre / arctic radius $n/\\sqrt{2}$'); c_.set_ylabel('$|\\Psi|/\\Psi_{\\rm sat}$')
+c_.set_xlim(0,1.42); c_.set_ylim(0,1.08); c_.set_xlabel('distance from center / arctic radius $n/\\sqrt{2}$'); c_.set_ylabel('$|\\Psi|/\\Psi_{\\rm sat}$')
 c_.legend(loc='center left',fontsize=6.5); TITLES.append((c_,'(c) radial profile'))
 fig.canvas.draw(); pc=c_.get_position(); c_.set_position([pc.x0+0.075,pc.y0,pc.width-0.075,pc.height])
 d=fig.add_subplot(gs[1,0]); draw(d,'Aztec I n=24','err'); TITLES.append((d,'(d) $|\\arg\\Psi-\\pi\\langle h\\rangle/4|$'))
@@ -46,8 +46,45 @@ cax=d.inset_axes([1.03,0.08,0.05,0.5]); cb=fig.colorbar(plt.cm.ScalarMappable(no
 cb.ax.tick_params(labelsize=6,length=2,width=.5,pad=1); cb.outline.set_linewidth(.5); cb.set_label('rad',fontsize=6.5,labelpad=1)
 e=fig.add_subplot(gs[1,1]); draw(e,'square L=40','phase'); TITLES.append((e,'(e) square, $L=40$'))
 f=fig.add_subplot(gs[1,2]); draw(f,'rectangle 56x28','phase'); TITLES.append((f,'(f) rectangle, $56\\times28$'))
-w=fig.add_subplot(gs[1,3],projection='polar'); wheel(w,fs=6); w.set_title('$\\arg\\Psi$',pad=7,fontsize=7.5)
-pos=w.get_position(); w.set_position([pos.x0+pos.width*0.2,pos.y0+pos.height*0.15,pos.width*0.6,pos.height*0.6])
+# phase key: colour wheel surrounded by the flat (basketweave) domino arrangements with arg Psi = k pi/4
+import sys
+from flat_phase import analyse
+from vform2 import S_TAB
+from matplotlib.patches import Rectangle, Polygon
+fig.canvas.draw(); bx=fig.add_subplot(gs[1,3]); bb=bx.get_position(); bx.remove()
+FW,FH=fig.get_size_inches(); AR=FW/FH; cxw=bb.x0+bb.width*0.42; cyw=bb.y0+bb.height*0.22; rw=bb.width*0.15
+w=fig.add_axes([cxw-rw,cyw-rw*AR,2*rw,2*rw*AR],projection='polar'); wheel(w,fs=6); w.set_xticklabels([])
+CH={0:(1,1,False,4),1:(0,1,False,0),2:(0,0,False,0),3:(1,0,False,0)}
+OR_,BL_,ORl_,BLl_='#e8743a','#2f6db5','#f6c6a8','#aac6ea'; ps=bb.width*0.29; Rr=bb.width*0.42
+for k,(al,be,par,off) in CH.items():
+    ph=k*math.pi/4; psi,hb,Pf,hh=analyse(al,be,par,off,W=12)
+    fig.add_artist(plt.Line2D([cxw+rw*1.02*math.cos(ph),cxw+(Rr-ps*0.55)*math.cos(ph)],[cyw+rw*1.02*math.sin(ph)*AR,cyw+(Rr-ps*0.55)*math.sin(ph)*AR],transform=fig.transFigure,color='k',lw=.8))
+    px=cxw+Rr*math.cos(ph); py=cyw+Rr*math.sin(ph)*AR
+    # Shakti view: tetrominoes coloured by v (orange +1, blue -1), dark = strong arm, light = weak arm (as in Fig. 11)
+    from core import short_cell, pcen
+    X0=sum(pcen(c)[0] for c in ((-1,-1),(0,-1),(-1,0),(0,0)))/4; Y0=sum(pcen(c)[1] for c in ((-1,-1),(0,-1),(-1,0),(0,0)))/4
+    Hs=2.9; a=fig.add_axes([px-ps/2,py-ps/2*AR,ps,ps*AR]); a.set_xlim(X0-Hs-.45,X0+Hs+.45); a.set_ylim(Y0-Hs-.45,Y0+Hs+.45); a.set_aspect('equal'); a.axis('off')
+    a.add_patch(Rectangle((X0-Hs-.45,Y0-Hs-.45),2*Hs+.9,2*Hs+.9,fc=colour(0.3*cmath.exp(1j*ph)),ec='none',zorder=0))
+    clipr=Rectangle((X0-Hs,Y0-Hs),2*Hs,2*Hs,transform=a.transData); seen=set()
+    for x in range(-6,7):
+        for y in range(-6,7):
+            c=(x,y); d=tuple(sorted((c,Pf(c))))
+            if d in seen: continue
+            seen.add(d); sqs=[q for cc in d for q in rect(cc)]
+            if all(abs(q[0]+.5-X0)>Hs+.5 or abs(q[1]+.5-Y0)>Hs+.5 for q in sqs): continue
+            p0=d[0]; typ='H' if d[1][0]!=d[0][0] else 'V'
+            v=S_TAB[(typ,p0[0]%4,p0[1]%4)]*(1 if (hh[p0]//4)%2==0 else -1)
+            st=short_cell(*d)
+            for cc in d:
+                fc=(OR_ if cc==st else ORl_) if v>0 else (BL_ if cc==st else BLl_)
+                P_=a.add_patch(Polygon(outline(list(rect(cc))),closed=True,fc=fc,ec='none',zorder=2)); P_.set_clip_path(clipr)
+            P_=a.add_patch(Polygon(outline(sqs),closed=True,fill=False,ec='k',lw=.5,zorder=3)); P_.set_clip_path(clipr)
+    a.plot(X0,Y0,'o',ms=2.2,mfc='white',mec='k',mew=.6,zorder=5)
+    if k==1: fig.text(px+ps/2+0.004,py+ps/2*AR,f'{k}',fontsize=7,ha='left',va='top')
+    elif k==0: fig.text(px-ps/2-0.004,py-ps/2*AR,f'{k}',fontsize=7,ha='right',va='bottom')
+    else: fig.text(px-ps/2-0.004,py+ps/2*AR,f'{k}',fontsize=7,ha='right',va='top')
+fig.text(cxw,bb.y0-0.005,'$\\ell+4$: same tiles, all $v$ reversed',ha='center',va='top',fontsize=6)
+TITLES.append((bx,'(g) phase key, $\\arg\\Psi=\\ell\\pi/4$'))
 fig.canvas.draw()
 for ax_,t in TITLES:
     bb=ax_.get_position(); fig.text(bb.x0,bb.y1+0.012,t,ha='left',va='bottom',fontsize=8)

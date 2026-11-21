@@ -21,12 +21,12 @@ for _ in range(20000):
         dom[(i,j)]=(i+1,j);dom[(i+1,j)]=(i,j);dom[(i,j+1)]=(i+1,j+1);dom[(i+1,j+1)]=(i,j+1)
 doms0=sorted({tuple(sorted((c,dom[c]))) for c in base})
 black=lambda c:(c[0]+c[1])%2==0
-typecol={'E':CAT[1],'W':CAT[0],'N':CAT[3],'S':CAT[2]}
+typecol={'E':'#e6b31e','W':'#d6336c','N':'#2a9d6f','S':'#7b4fb8'}   # yellow, raspberry, green, purple (blue/orange are reserved for v)
 def dtype(d):
     b=d[0] if black(d[0]) else d[1]; w=d[1] if b==d[0] else d[0]
     return {(1,0):'E',(-1,0):'W',(0,1):'N',(0,-1):'S'}[(w[0]-b[0],w[1]-b[1])]
 def shade(c,bl):
-    r=to_rgb(c); return tuple(0.8*x for x in r) if bl else tuple(0.45*x+0.55 for x in r)
+    r=to_rgb(c); return tuple(0.92*x for x in r) if bl else tuple(0.42*x+0.58 for x in r)
 def outline(sqs):
     E=set()
     for (x,y) in sqs:
@@ -64,7 +64,7 @@ for k,d in enumerate(doms0,1):
     A.add_patch(Polygon(outline(list(d)),closed=True,fill=False,ec='k',lw=.9))
     A.text(sum(c[0] for c in d)/2+.5,sum(c[1] for c in d)/2+.5,str(k),ha='center',va='center',fontsize=5.5)
 A.set_xlim(-n-.3,n+.3); A.set_ylim(-n-.3,n+.3); A.set_aspect('equal'); A.axis('off')
-A.set_title('Aztec diamond, $n=5$',pad=2); label_in(A,'(a)',x=0.0,y=1.0)
+A.set_title('(a) Aztec diamond, $n=5$',loc='left',pad=2)
 for idx,(pl,sh) in enumerate((('I',((n+1)%2,0)),('II',(n%2,0)))):
     B=fig.add_subplot(gs[idx+1]); used=[]
     for k,d in enumerate(doms0,1):
@@ -74,8 +74,8 @@ for idx,(pl,sh) in enumerate((('I',((n+1)%2,0)),('II',(n%2,0)))):
             r=list(rect(c)); sq+=r; used.append(r); rs.append((r,c))
         shape=Polygon(inset(outline(sq),GAP),closed=True,fill=False,ec='k',lw=1.0,zorder=6)
         clip=Polygon(inset(outline(sq),GAP),closed=True,transform=B.transData)
-        for r,c in rs:
-            P=B.add_patch(Polygon(outline(r),closed=True,fc=shade(typecol[t],black(c)),ec='none',zorder=3))
+        for (r,c),c0 in zip(rs,d):   # shade = colour of the cell in (a): dark = black cell of (a)
+            P=B.add_patch(Polygon(outline(r),closed=True,fc=shade(typecol[t],black(c0)),ec='none',zorder=3))
             P.set_clip_path(clip)
         # thin white line where the two plaquettes of the tetromino meet
         r0=set(map(tuple,rs[0][0])); r1=set(map(tuple,rs[1][0]))
@@ -98,14 +98,14 @@ for idx,(pl,sh) in enumerate((('I',((n+1)%2,0)),('II',(n%2,0)))):
         else: B.plot([a[0]+.18,b[0]-.18],[a[1],a[1]],color='#6b6b6b',lw=1.9,solid_capstyle='butt',zorder=2)
     xs=[p[0] for r in used for p in r]; ys=[p[1] for r in used for p in r]
     B.set_xlim(min(xs)-.3,max(xs)+1.3); B.set_ylim(min(ys)-.3,max(ys)+1.3); B.set_aspect('equal'); B.axis('off')
-    B.set_title(f'Shakti lattice, placement {pl}',pad=2); label_in(B,'(b)' if idx==0 else '(c)',x=0.0,y=1.0)
+    B.set_title(('(b)' if idx==0 else '(c)')+f' Shakti lattice, placement {pl}',loc='left',pad=2)
 h=[Patch(fc=shade(typecol[t],True),ec='none',label=lab) for t,lab in (('E','E'),('W','W'),('N','N'),('S','S'))]
-fig.legend(handles=h+[Patch(fc='#999',label='dark: black cell = horizontal plaquette'),Patch(fc='#ddd',label='light: white cell = vertical plaquette'),
+fig.legend(handles=h+[Patch(fc='#999',label='dark: black cell of (a)'),Patch(fc='#ddd',label='light: white cell of (a)'),
                      plt.Line2D([],[],color='#6b6b6b',lw=2,label='island')],loc='lower center',ncol=7,fontsize=6.5,handlelength=1.2,columnspacing=0.9,bbox_to_anchor=(0.5,0.335))
 
 # ---- (d) geometry of the map: chessboard square -> Shakti diamond, chessboard diamond -> Shakti square
 def chess_ax(a,cells):
-    for c in cells: a.add_patch(Polygon(outline([c]),closed=True,fc='#7d8fb3' if black(c) else '#c9d3e6',ec='white',lw=.3))
+    for c in cells: a.add_patch(Polygon(outline([c]),closed=True,fc='#8c8c8c' if black(c) else '#dedede',ec='white',lw=.3))
     a.add_patch(Polygon(outline(list(cells)),closed=True,fill=False,ec='k',lw=.8))
     xs=[c[0] for c in cells]; ys=[c[1] for c in cells]
     cx=(min(xs)+max(xs)+1)/2; cy=(min(ys)+max(ys)+1)/2; a.set_xlim(cx-HR,cx+HR); a.set_ylim(cy-HR,cy+HR); a.set_aspect('equal'); a.axis('off')
@@ -113,7 +113,7 @@ def shakti_ax(a,cells):
     sq=[]
     for c in cells:
         r=list(rect(c)); sq+=r
-        a.add_patch(Polygon(outline(r),closed=True,fc='#7d8fb3' if black(c) else '#c9d3e6',ec='white',lw=.3))
+        a.add_patch(Polygon(outline(r),closed=True,fc='#8c8c8c' if black(c) else '#dedede',ec='white',lw=.3))
     a.add_patch(Polygon(outline(sq),closed=True,fill=False,ec='k',lw=.8))
     xs=[p[0] for p in sq]; ys=[p[1] for p in sq]
     cx=(min(xs)+max(xs)+1)/2; cy=(min(ys)+max(ys)+1)/2; a.set_xlim(cx-HR,cx+HR); a.set_ylim(cy-HR,cy+HR); a.set_aspect('equal'); a.axis('off')
@@ -130,5 +130,5 @@ for k in (1,5):
     bb=fig.add_subplot(gd[k]); bb.axis('off')
     bb.annotate('',xy=(0.95,0.5),xytext=(0.05,0.5),xycoords='axes fraction',arrowprops=dict(arrowstyle='-|>',lw=1.1,color='k'))
     bb.text(0.5,0.62,'$45^\\circ$, $\\times\\sqrt{2}$',ha='center',va='bottom',fontsize=6.5,transform=bb.transAxes)
-fig.text(0.005,0.262,'(d)',ha='left',va='bottom',fontsize=9,fontweight='bold')
+fig.text(0.005,0.262,'(d)',ha='left',va='bottom',fontsize=8)
 save(fig,'fig1_mapping')

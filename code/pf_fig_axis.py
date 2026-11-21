@@ -36,9 +36,9 @@ def arctic(key):
     Xc=np.array([[c[0]+.5,c[1]+.5,1] for c in cells]); Yc=np.array([pcen(c) for c in cells]); Aff,*_=np.linalg.lstsq(Xc,Yc,rcond=None)
     th=np.linspace(0,2*np.pi,400); return np.c_[sh0+n/math.sqrt(2)*np.cos(th),n/math.sqrt(2)*np.sin(th),np.ones_like(th)]@Aff
 EN={'II':F[5]['free']['E'],'forced':F[5]['forced']['E'],'I':30.0}
-fig=plt.figure(figsize=(TWO,6.9)); TITLES=[]; HEAD=[]
-gs=fig.add_gridspec(3,4,width_ratios=[1,1,1,0.42],wspace=0.1,hspace=0.36,left=0.0,right=0.995,top=0.935,bottom=0.012)
-rows=(('II','edges along block boundaries, edge plaquettes free (ground state): Aztec II'),('forced','edges along block boundaries, every plaquette forced into a tetromino (comparison)'),('I','edges through blocks: Aztec I'))
+fig=plt.figure(figsize=(TWO,6.75)); TITLES=[]; HEAD=[]
+gs=fig.add_gridspec(3,3,wspace=0.1,hspace=0.2,left=0.03,right=0.97,top=0.955,bottom=0.012)
+rows=(('II','edges along block boundaries, edge plaquettes free (ground state): placement-II Aztec diamond'),('forced','edges along block boundaries, every plaquette forced into a tetromino (comparison)'),('I','edges through the blocks: placement-I Aztec diamond'))
 for r,(key,lab) in enumerate(rows):
     L=['abc','def','ghi'][r]
     s=fig.add_subplot(gs[r,0]); gs_panel(s,key); TITLES.append((s,f'({L[0]}) vertex model, $12\\times12$, $E={G[(5,key)]["E"] if "E" in G[(5,key)] else EN[key]:.0f}J$'))
@@ -47,12 +47,7 @@ for r,(key,lab) in enumerate(rows):
     TITLES.append((a,f'({L[1]}) $|\\Psi|/\\Psi_{{\\rm sat}}$, $48\\times48$'))
     b=fig.add_subplot(gs[r,2]); draw(b,key,'phase'); TITLES.append((b,f'({L[2]}) $\\arg\\Psi$, $48\\times48$'))
     HEAD.append((s,lab))
-cax=fig.add_axes([0.905,0.70,0.014,0.17]); cb=fig.colorbar(plt.cm.ScalarMappable(norm=amp_norm,cmap='viridis'),cax=cax,ticks=[0,.5,1])
-cb.ax.tick_params(labelsize=6.5,length=2,width=.5); cb.outline.set_linewidth(.5); cb.set_label('$|\\Psi|/\\Psi_{\\rm sat}$',fontsize=7)
-w=fig.add_axes([0.875,0.10,0.11,0.14],projection='polar'); wheel(w,fs=6); w.set_title('$\\arg\\Psi$',pad=7,fontsize=7.5)
 fig.canvas.draw()
 for ax_,t in TITLES:
-    bb=ax_.get_position(); fig.text(bb.x0,bb.y1+0.008,t,ha='left',va='bottom',fontsize=7.5)
-for ax_,t in HEAD:
-    bb=ax_.get_position(); fig.text(0.005,bb.y1+0.032,t,fontsize=8,fontweight='bold',ha='left',va='bottom')
+    bb=ax_.get_position(); fig.text(bb.x0,bb.y1+0.008,t,ha='left',va='bottom',fontsize=8)
 save(fig,'fig_axis')
