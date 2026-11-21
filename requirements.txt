@@ -3,7 +3,7 @@ scipy
 matplotlib
 numba
 networkx
-pulp
+pulp<3
 sympy
 mpmath
 Pillow
