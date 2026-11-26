@@ -69,10 +69,10 @@ MIT (see `LICENSE`).
 
 ## Finite-temperature boundary of straight-edged samples (Sec. V E, Fig. 14)
 - `edge_partial_ilp.py n` — open vertex model: pairing a set S of edge plaquettes costs exactly J|S|/2.
-- `pf_edge.py`, `pf_test7.py n` — Pfaffian with monomers on the outer face; checked against brute-force subset sums (n = 5, 7).
-- `edge_exact.py n x1 x2 ...` (x = J/T) — exact paired fraction and central |Psi| (low-rank Pfaffian seam updates).
-- `edge_np.py n x` — <N_p> from edge probabilities (low-T law <N_p> = 2^(n+2) e^(-J/T)).
-- `edge_mc.py` — independent Monte Carlo check; `pf_fig_edgeT.py` — Fig. 14.
+- `edge_half.py` — boundary excitations: freeable edge plaquettes (weight e^(J/2T)) and half-dimer sites (a boundary z=3 vertex unhappy while covering one plaquette; weight n_c e^(-J/2T)); Pfaffian with all monomers on the outer face (`bmono.py`). `open_sample.py`, `bmono.py` and `vertex_dos.py` are copied from the companion repository [shakti-arctic-design](https://github.com/cywon-commits/shakti-arctic-design).
+- `edge_vertex_check.py L ...` — the model against the exact density of states of the full vertex model (transfer matrix): first excited level identical for X = 8, 12 (block-aligned and through-block).
+- `edge_exact2.py aligned|through n t1 t2 ...` (t = T/T_on) — exact defect number, paired fraction and central |Psi|; low-T law <N_d> = 2^(n+4) e^(-J/T) (block-aligned), 2^(n+2) e^(-J/T) (through-block). `pf_fig_edgeT.py` — Fig. 14.
+- Superseded (edge plaquettes only, no half-dimer sites): `edge_exact.py`, `edge_np.py`, `pf_edge.py`, `pf_test7.py`, `edge_mc.py`.
 
 ## Dipolar replicas and Binder cumulant (Sec. VII, App. D)
 - `dip_setup.py L point`, then `dip_binder.py L seed 3000 400 10` (four seeds per L = 24, 32, 48, 64); `dip_analyse.py` prints U(L,T), 2x with bootstrap errors.

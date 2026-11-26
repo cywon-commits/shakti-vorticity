@@ -7,3 +7,5 @@ pulp<3
 sympy
 mpmath
 Pillow
+python-flint
+pfapack

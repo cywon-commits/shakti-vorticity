@@ -11,4 +11,4 @@ fig10_examples.pdf  <-  pf_fig3.py
 fig11_shape.pdf  <-  pf_fig6.py
 fig12_psi.pdf  <-  pf_fig12_psi.py (data: exact_psi_nm.py I 36 37 38 39)
 fig13_holes.pdf  <-  pf_fig9.py
-fig14_edge_temperature.pdf  <-  pf_fig_edgeT.py
+fig14_edge_temperature.pdf  <-  pf_fig_edgeT.py (data: edge_exact2.py aligned|through n ...)
